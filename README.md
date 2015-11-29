@@ -64,6 +64,10 @@ Use the example script: https://github.com/funkymrrogers/acd-backups/blob/master
 
 Be sure to edit the varibles if you've chosen a different version of python, or if you've modified any of the locations
 
-# Moving forward
+# TODO
 
-The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron.
+The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron. This needs to be incorporated into this doc - including advice on a mount script and having systemd run that on boot, running backup scripts via cron with a simple 'flock'
+
+Restores are tricky. With a large dataset the ACD mount is very slow to list files. Some testing needs to be done to illustrate single file, single directory, and whole dataset restore. The single file and directory might reasonably come out of the encfs mount of the acd mount, however a whole dataset restore might use a single 'acd_cli download' command writing to the 'encfs --reverse' mount.
+
+Pull requests appreciated for the TODO items.
