@@ -30,8 +30,8 @@ Visit https://tensile-runway-92512.appspot.com in a web browser, login.
 
 Take oauth_data output and write to /root/.cache/acd_cli/oauth_data
 
-    acd_init
-    acd_sync
+    acd_cli init
+    acd_cli sync
 
 # Mount source and acd
 
