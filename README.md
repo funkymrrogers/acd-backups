@@ -38,6 +38,8 @@ Example directory will be movies
 
     mkdir /mnt/movies
     mkdir /mnt/acd
+    mkdir /mnt/.movies
+    mkdir /mnt/acd-movies
     acd_cli mount /mnt/acd/
 
 Mount @ /mnt/movies, mount read only to be safe
