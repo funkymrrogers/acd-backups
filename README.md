@@ -13,7 +13,7 @@ Amazon cloud drive account or trial.
 
 # Introduction
 
-There's a guide @ https://amc.ovh/2015/08/14/mounting-uploading-amazon-cloud-drive-encrypted.html that covers most of the stuff needed, excepting unencrypted soruce files - and missing some details that seemed useful.
+There's a guide @ https://amc.ovh/2015/08/14/mounting-uploading-amazon-cloud-drive-encrypted.html that covers most of the stuff needed, excepting unencrypted source files - and missing some details that seemed useful.
 
 # Prepping a Centos 7 VM
 
@@ -42,7 +42,7 @@ Example directory will be movies
 
 Mount @ /mnt/movies, mount read only to be safe
 
-# Mount an encyrpted view of source and an unencrypted view of acd:/backups/.1
+# Mount an encrypted view of source and an unencrypted view of acd:/backups/.1
 
 Initialize your encfs config first, when the first encfs command is selected the encfs.xml file will be generated. After the first time the config file will be referenced for the settings. Keep this config file safe just like the password, you must reproduce it for restores. The password is not stored in the config file, we'll be storing it in another file for convenience.
 
@@ -63,4 +63,4 @@ Be sure to edit the varibles if you've chosen a different version of python, or 
 
 # Moving forward
 
-The encfs mount commands must be run at startup, and the backup .sh script can also be added to cron.
+The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron.
