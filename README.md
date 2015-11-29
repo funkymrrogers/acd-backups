@@ -3,13 +3,13 @@ Backing up to Amazon Cloud Drive
 
 # Assumptions
 
-Need to backup unecrypted source files to Amazon in an encrypted format
-Source files are accessible via NFS, or are local
+* Need to backup unecrypted source files to Amazon in an encrypted format
+* Source files are accessible via NFS, or are local
 
 # Prerequisites
 
-Centos 7 VM, or physical box.
-Amazon cloud drive account or trial.
+* Centos 7 VM, or physical box.
+* Amazon cloud drive account or trial.
 
 # Introduction
 
@@ -27,6 +27,7 @@ There's a guide @ https://amc.ovh/2015/08/14/mounting-uploading-amazon-cloud-dri
 # acd_cli ACD auth
 
 Visit https://tensile-runway-92512.appspot.com in a web browser, login.
+
 Take oauth_data output and write to /root/.cache/acd_cli/oauth_data
 
     acd_init
