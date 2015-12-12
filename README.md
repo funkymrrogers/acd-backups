@@ -99,7 +99,13 @@ Moving to a directory and deleting a testfile to be restored (only part of test 
 
 Moving to the acd unencrypted view, and copying the file out to accomplish the restore. Listing the directories in the /mnt/acd-movies folder incurs a time penalty based on the number of objects in /mnt/acd-movies (see lessons learned). This can be done if the directory structure is unknown, but attempt to avoid by moving directly into the target backup directory as this does not incur a time penalty.
 
-
+    [root@vmbackup01 testdir]# cd /mnt/acd-movies/testdir
+    [root@vmbackup01 testdir]# dd if=testfile of=/mnt/moviesRW/testdir/testfile bs=1M
+    4096+0 records in
+    4096+0 records out
+    4294967296 bytes (4.3 GB) copied, 3690.6 s, 1.2 MB/s
+    [root@vmbackup01 testdir]# md5sum /mnt/moviesRW/testdir/testfile
+    c9a5a6878d97b48cc965c1e41859f034  /mnt/moviesRW/testdir/testfile
 
 ### Entire dataste restore
 
