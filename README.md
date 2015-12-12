@@ -100,6 +100,7 @@ Moving to a directory and deleting a testfile to be restored (only part of test 
 Moving to the acd unencrypted view, and copying the file out to accomplish the restore. Listing the directories in the /mnt/acd-movies folder incurs a time penalty based on the number of objects in /mnt/acd-movies (see lessons learned). This can be done if the directory structure is unknown, but attempt to avoid by moving directly into the target backup directory as this does not incur a time penalty.
 
 
+
 ### Entire dataste restore
 
 ## TODO
@@ -151,6 +152,14 @@ So what are the takeaways?
   * Consider scripting backups of huge directories with small files as tarball backups to a dedicated backup directory, that is then sent to acd.
   * Single file restores must be done utilizing the slow method, so expect those to be cumbersome if the directory has a large number of objects.
 * Whole dataset restores should be done utilizing acdcli directly (will use this lesson to design restore procedure)
+
+### `cp` files through encfs > ACDFuse > acd hangs
+Utilizing `cp` to restore large files from the ACDFuse mount produced hangs on CentOS 7. It appears that it doesn't begin flushing large files to disk immediatley. This may work on a system with RAM > file to be restored, and operator patience. This behavior was not explored in depth.
+
+Utilizing `dd` with `bs=1M` did not hang.
+
+So what are the takeaways?
+* For now, `dd` will be documented as single file restore method. Please submit pull requests if further testing reveals an easier way to perform a single file restore.
 
 ### Backup or archive this is not
 A backup in the traditional sense is a point-in-time copy of data to be used for restore. Several point-in-time backups might make up an archive (one definition of archive). Archive can also refer to the practice of de-staging cold data out of the hot data storage...
