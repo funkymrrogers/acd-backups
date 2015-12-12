@@ -59,6 +59,8 @@ Initialize your encfs config first, when the first encfs command is selected the
     fusermount -u /mnt/.movies
     cat /root/backup-scripts/enc-passwd | ENCFS6_CONFIG='/root/backup-scripts/encfs.xml' encfs -S --reverse /mnt/movies /mnt/.movies
     cat /root/backup-scripts/enc-passwd | ENCFS6_CONFIG='/root/backup-scripts/encfs.xml' encfs -S /mnt/acd/backups/.1 /mnt/acd-movies
+    
+Don't forget to save both the `/root/backup-scripts/enc-passwd` and `/root/backup-scripts/encfs.xml` files in whatever manner works for you. 
 
 ### Performinmg backup
 
@@ -67,6 +69,7 @@ Use the example script: https://github.com/funkymrrogers/acd-backups/blob/master
 Be sure to edit the varibles if you've chosen a different version of python, or if you've modified any of the locations
 
 ## Restores
+Are the `/root/backup-scripts/enc-passwd` and `/root/backup-scripts/encfs.xml` files safe? If not, the files are gone forever.
 
 ### Single file restore
 See lessons learned, expect the single (or several) file restore procedure to be cumbersome if the dataset has large numbers of objects in each directory.
