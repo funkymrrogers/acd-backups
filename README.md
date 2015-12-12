@@ -172,6 +172,5 @@ So what are the takeaways?
 * If the source data is constantly changing it needs to be captured at a point in time, and then backed up
   * Example: A mysql database should be dumped to <table>.<datetime>.sql files, and the dump directory should be backed up. The source database files should not be backed up.
   * Example: A directory full of documents, spreadsheets and so on that are constantly changing should be regularly dumped to a .tar.gz file. The .tar.gz file should be placed in a dump directory that is backed up.
-
 * Some datasets can be backed up directly, these datasets are charachterized by files that are written and never deleted. By virtue of files never being deleted, the backups do produce a latest point-in-time copy - and versioning would add no value as the files are never updated.
   * Example: A PVR dataset where TV episodes are recorded from cable, and added as <basedir>/<series>/<season>/<episode> to the dataset. This dataset has files that should only be written once. 
