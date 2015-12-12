@@ -108,12 +108,45 @@ Moving to the acd unencrypted view, and copying the file out to accomplish the r
     c9a5a6878d97b48cc965c1e41859f034  /mnt/moviesRW/testdir/testfile
 
 ### Entire dataste restore
+#### Temporary workaround method
+Restore the encrypted files to a temporary dataset:
+
+    [root@vmbackup01 .1]# mkdir /mnt/.restoredfiles/
+    [root@vmbackup01 .1]# acd_cli download /backups/.1/ /mnt/.restoredfiles/
+
+Mount an unencrypted view:
+
+    [root@vmbackup01 .1]# mkdir /mnt/restoredfiles/
+    [root@vmbackup01 mnt]# cat /root/backup-scripts/enc-passwd | ENCFS6_CONFIG='/root/backup-scripts/encfs.xml' encfs -S /mnt/.restoredfiles/.1 /mnt/restoredfiles
+
+Then move into /mnt/restoredfiles and copy out either the partial or entire dataset.
+
+#### The way it should work
+There's an elusive bug that causes the freshly writen restored files to vanish using the following method.
+
+An entire dataset can be restored either over the existing, damaged dataset - or to a new, empty dataset. Restores executed against an existing dataset should only affect files that are missing, or different.
+
+The following is based on a restore from the encrytped acd:/backups/.1/ backup to the /mnt/movies. If you have a new dataset at /mnt/<new dataset> replace commands accordingly.
+
+First, a tricky encfs mount needs to be created. Because of the way the recursive acd_cli restores are traversed, if we use the /mnt/movies example we need to do a --reverse encfs mount with /.1/ as the last folder in the path.
+
+    [root@vmbackup01 mnt]# mkdir -p /mnt/restoretargets/.1
+    [root@vmbackup01 mnt]# cat /root/backup-scripts/enc-passwd | ENCFS6_CONFIG='/root/backup-scripts/encfs.xml' encfs -S --reverse /mnt/movies /mnt/restoretargets/.1
+
+Second, the incomplete suffix that acd_cli uses needs to be nulled out. For encfs --reverse to work, the filenames must not be appended with ._incomlete during transfer.
+
+Edit `/usr/lib/python3.4/site-packages/acdcli/api/content.py` and set `PARTIAL_SUFFIX = ''` - this is line 21 in the current version of the file.
+
+Once the previous steps are completed the restore is trivial.
+
+    [root@vmbackup01 .1]# acd_cli download /backups/.1/ /mnt/restoretargets/
+
 
 ## TODO
 
 The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron. This needs to be incorporated into this doc - including advice on a mount script and having systemd run that on boot, running backup scripts via cron with a simple `flock`
 
-Restores are tricky. With a large dataset the ACD mount is very slow to list files. Some testing needs to be done to illustrate single file, single directory, and whole dataset restore. The single file and directory might reasonably come out of the encfs mount of the acd mount, however a whole dataset restore might use a single `acd_cli download` command writing to the `encfs --reverse` mount.
+--Restores are tricky. With a large dataset the ACD mount is very slow to list files. Some testing needs to be done to illustrate single file, single directory, and whole dataset restore. The single file and directory might reasonably come out of the encfs mount of the acd mount, however a whole dataset restore might use a single `acd_cli download` command writing to the `encfs --reverse` mount.--
 
 Pull requests appreciated for the TODO items.
 
@@ -166,6 +199,12 @@ Utilizing `dd` with `bs=1M` did not hang.
 
 So what are the takeaways?
 * For now, `dd` will be documented as single file restore method. Please submit pull requests if further testing reveals an easier way to perform a single file restore.
+ 
+### Both `cp` and `dd` through encfs > ACDFuse > acd are slow
+Using `cp` or `dd` to copy files out of the unencrypted view is noticably slow. 
+
+So what are the takeaways?
+* Depending on the type of dataset, and restore requirements consider using the full dataset restore method. Full dataset restore will only alter files which differ from the ACD copy.
 
 ### Backup or archive this is not
 A backup in the traditional sense is a point-in-time copy of data to be used for restore. Several point-in-time backups might make up an archive (one definition of archive). Archive can also refer to the practice of de-staging cold data out of the hot data storage...
