@@ -1,21 +1,21 @@
 # acd-backups
 Backing up to Amazon Cloud Drive
 
-# Assumptions
+## Assumptions
 
 * Need to backup unecrypted source files to Amazon in an encrypted format
 * Source files are accessible via NFS, or are local
 
-# Prerequisites
+## Prerequisites
 
 * Centos 7 VM, or physical box.
 * Amazon cloud drive account or trial.
 
-# Introduction
+## Introduction
 
 There's a guide @ https://amc.ovh/2015/08/14/mounting-uploading-amazon-cloud-drive-encrypted.html that covers most of the stuff needed, excepting unencrypted source files - and missing some details that seemed useful.
 
-# Prepping a Centos 7 VM
+## Prepping a Centos 7 VM
 
     yum update –y
     yum install python34 –y
@@ -24,7 +24,7 @@ There's a guide @ https://amc.ovh/2015/08/14/mounting-uploading-amazon-cloud-dri
     python3.4 get-pip.py
     pip3 install --upgrade git+https://github.com/yadayada/acd_cli.git
 
-# acd_cli ACD auth
+## acd_cli ACD auth
 
 Visit https://tensile-runway-92512.appspot.com in a web browser, login.
 
@@ -33,7 +33,7 @@ Take oauth_data output and write to /root/.cache/acd_cli/oauth_data
     acd_cli init
     acd_cli sync
 
-# Mount source and acd
+## Mount source and acd
 
 Example directory will be movies
 
@@ -45,7 +45,7 @@ Example directory will be movies
 
 Mount @ /mnt/movies, mount read only to be safe
 
-# Mount an encrypted view of source and an unencrypted view of acd:/backups/.1
+## Mount an encrypted view of source and an unencrypted view of acd:/backups/.1
 
 Initialize your encfs config first, when the first encfs command is selected the encfs.xml file will be generated. After the first time the config file will be referenced for the settings. Keep this config file safe just like the password, you must reproduce it for restores. The password is not stored in the config file, we'll be storing it in another file for convenience.
 
@@ -58,16 +58,59 @@ Initialize your encfs config first, when the first encfs command is selected the
     cat /root/backup-scripts/enc-passwd | ENCFS6_CONFIG='/root/backup-scripts/encfs.xml' encfs -S --reverse /mnt/movies /mnt/.movies
     cat /root/backup-scripts/enc-passwd | ENCFS6_CONFIG='/root/backup-scripts/encfs.xml' encfs -S /mnt/acd/backups/.1 /mnt/acd-movies
 
-# Backup
+## Backup
 
 Use the example script: https://github.com/funkymrrogers/acd-backups/blob/master/movies.sh
 
 Be sure to edit the varibles if you've chosen a different version of python, or if you've modified any of the locations
 
-# TODO
+## TODO
 
 The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron. This needs to be incorporated into this doc - including advice on a mount script and having systemd run that on boot, running backup scripts via cron with a simple `flock`
 
 Restores are tricky. With a large dataset the ACD mount is very slow to list files. Some testing needs to be done to illustrate single file, single directory, and whole dataset restore. The single file and directory might reasonably come out of the encfs mount of the acd mount, however a whole dataset restore might use a single `acd_cli download` command writing to the `encfs --reverse` mount.
 
 Pull requests appreciated for the TODO items.
+
+## Lessons Learned
+
+### Listing directories through encfs > ACDFuse > acd is slow
+There appears to be a non linear time increase the more files are in a directory, if you've set up exactly per the discussed example this is the `/mnt/acd-movies` unencrypted view that is subject for this lesson.
+
+The following block shows the problem:
+
+    [root@vmbackup01 acd-movies]# time ls -l | wc -l
+    1133
+    
+    real    4m28.186s
+    user    0m0.056s
+    sys     0m0.108s
+    [root@vmbackup01 acd-movies]# cd ../acd-tv/
+    [root@vmbackup01 acd-tv]# time ls -l | wc -l
+    249
+    
+    real    0m16.745s
+    user    0m0.014s
+    sys     0m0.020s
+
+This block shows that listing the directories directly in their encrypted format sees a linear increase in delay, rather than the exponential increase outlined in the problem.
+
+    [root@vmbackup01 acd-tv]# time acdcli ls -l /backups/.1 | wc -l
+    1133
+    
+    real    0m7.663s
+    user    0m7.548s
+    sys     0m0.116s
+    [root@vmbackup01 acd-tv]# time acdcli ls -l /backups/.2 | wc -l
+    249
+    
+    real    0m2.476s
+    user    0m2.378s
+    sys     0m0.100s
+
+So what are the takeaways?
+* Beware of directories with large numbers of objects
+  * Consider scripting backups of huge directories with small files as tarball backups to a dedicated backup directory, that is then sent to acd.
+  * Single file restores must be done utilizing the slow method, so expect those to be cumbersome if the directory has a large number of objects.
+* Whole dataset restores should be done utilizing acdcli directly (will use this lesson to design restore procedure)
+
