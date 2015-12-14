@@ -64,9 +64,37 @@ Don't forget to save both the `/root/backup-scripts/enc-passwd` and `/root/backu
 
 ### Performinmg backup
 
-Use the example script: https://github.com/funkymrrogers/acd-backups/blob/master/movies.sh
+Use the example script: https://github.com/funkymrrogers/acd-backups/blob/master/movies.sh - store in `/root/backup-scripts/`, and set to executable using `chmod +x <script>.sh`. Run using `/root/backup-scripts/<script>.sh`.
 
 Be sure to edit the varibles if you've chosen a different version of python, or if you've modified any of the locations
+
+### Automating
+
+#### Mounting acd and encfs mounts at boot time
+systemd deprecated the use of `/etc/rc.d/rc.local`, but for the purposes of this walkthrough we'll be using it as some readers may not be using systemd yet.
+
+Place the https://github.com/funkymrrogers/acd-backups/blob/master/mountall.sh example script in `/root/backup-scripts`
+
+Edit the example script to suit your needs.
+
+Add the following line to `/etc/rc.d/rc.local`:
+
+    /root/backup-scripts/mountall.sh
+    
+Set the executable bit on both `/etc/rc.d/rc.local` and `/root/backup-scripts/mountall.sh`:
+
+    chmod +x /etc/rc.d/rc.local
+    chmod +x /root/backup-scripts/mountall.sh
+
+Reboot to test.
+
+#### Schedule backups to run automatically
+
+Run `crontab -e` as root and add the following line, edit the schedule specification to fit your needs. The `flock` will ensure that if a backup takes longer than the specified interval, the conflicting runs will be skipped. Add additional lines for each backup to be performed.
+
+    00 * * * * flock -n /root/backup-scripts/movies.lock -c /root/backup-scripts/movies.sh
+
+The example schedule runs at the top of every hour (00). As a point of reasonable practice, spread your backup jobs over your chosen interval. You might choose only to backup during the early morning if you find that bandwidth constraints cause backups to interfere with your work/play activities - (00 3,6 * * *) would backup only at 0300 and 0600.
 
 ## Restores
 Are the `/root/backup-scripts/enc-passwd` and `/root/backup-scripts/encfs.xml` files safe? If not, the files are gone forever.
@@ -147,9 +175,11 @@ Once the previous steps are completed the restore is trivial.
 
 ## TODO
 
-The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron. This needs to be incorporated into this doc - including advice on a mount script and having systemd run that on boot, running backup scripts via cron with a simple `flock`
+~~The encfs mount commands must be run at startup, and the `backup.sh` script can also be added to cron. This needs to be incorporated into this doc - including advice on a mount script and having systemd run that on boot, running backup scripts via cron with a simple `flock`~~
 
---Restores are tricky. With a large dataset the ACD mount is very slow to list files. Some testing needs to be done to illustrate single file, single directory, and whole dataset restore. The single file and directory might reasonably come out of the encfs mount of the acd mount, however a whole dataset restore might use a single `acd_cli download` command writing to the `encfs --reverse` mount.--
+~~Restores are tricky. With a large dataset the ACD mount is very slow to list files. Some testing needs to be done to illustrate single file, single directory, and whole dataset restore. The single file and directory might reasonably come out of the encfs mount of the acd mount, however a whole dataset restore might use a single `acd_cli download` command writing to the `encfs --reverse` mount.~~
+
+Guide is complete, but automation could be increased. 
 
 Pull requests appreciated for the TODO items.
 
