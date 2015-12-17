@@ -99,6 +99,18 @@ Run `crontab -e` as root and add the following line, edit the schedule specifica
 
 The example schedule runs at the top of every hour (00). As a point of reasonable practice, spread your backup jobs over your chosen interval. You might choose only to backup during the early morning if you find that bandwidth constraints cause backups to interfere with your work/play activities - (00 3,6 * * *) would backup only at 0300 and 0600.
 
+#### Rotate your log files
+
+Create `/etc/logrotate.d/backup-scripts` with the following contents. Modify to suit needs, the definition below will keep 7 days of compressed log files.
+
+    /root/backup-scripts/*.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    copytruncate
+    }
+
 ## Restores
 Are the `/root/backup-scripts/enc-passwd` and `/root/backup-scripts/encfs.xml` files safe? If not, the files are gone forever.
 
