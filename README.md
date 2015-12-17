@@ -20,6 +20,7 @@ There's a guide @ https://amc.ovh/2015/08/14/mounting-uploading-amazon-cloud-dri
 ### Prepping a Centos 7 VM
 
     yum update –y
+    yum install epel-release -y
     yum install python34 –y
     curl -O https://bootstrap.pypa.io/get-pip.py
     chmod +x ./get-pip.py
