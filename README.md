@@ -91,9 +91,11 @@ Reboot to test.
 
 #### Schedule backups to run automatically
 
+Create `/root/backup-scripts/backup.sh` and add a line with the path of each backup script.
+
 Run `crontab -e` as root and add the following line, edit the schedule specification to fit your needs. The `flock` will ensure that if a backup takes longer than the specified interval, the conflicting runs will be skipped. Add additional lines for each backup to be performed.
 
-    00 * * * * flock -n /root/backup-scripts/movies.lock flock /root/backup-scripts/serial.lock -c /root/backup-scripts/movies.sh
+    00 * * * * flock -n /root/backup-scripts/backup.lock -c /root/backup-scripts/backup.sh
 
 The example schedule runs at the top of every hour (00). As a point of reasonable practice, spread your backup jobs over your chosen interval. You might choose only to backup during the early morning if you find that bandwidth constraints cause backups to interfere with your work/play activities - (00 3,6 * * *) would backup only at 0300 and 0600.
 
