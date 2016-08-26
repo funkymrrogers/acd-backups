@@ -58,7 +58,7 @@ Drops you into the config dialog. You're going to set up a "remote" which is sim
     Waiting for code...
     Got code
     --------------------
-    [remote]
+    [acd]
     client_id = 
     client_secret = 
     token = {"access_token":"xxxxxxxxxxxxxxxxxxxxxxx","token_type":"bearer","refresh_token":"xxxxxxxxxxxxxxxxxx","expiry":"2015-09-06T16:07:39.658438471+01:00"}
@@ -87,7 +87,7 @@ Now configure crypt using rclone config. We will call this one secret to differe
     s) Set configuration password
     q) Quit config
     n/s/q> n   
-    name> secret
+    name> acd-rclone1
     Type of storage to configure.
     Choose a number from below, or type in your own value
      1 / Amazon Drive
@@ -150,7 +150,7 @@ Now configure crypt using rclone config. We will call this one secret to differe
     y/n> y
     Remote config
     --------------------
-    [secret]
+    [acd-rclone1]
     remote = acd:rclone1
     filename_encryption = standard
     password = CfDxopZIXFG0Oo-ac7dPLWWOHkNJbw
